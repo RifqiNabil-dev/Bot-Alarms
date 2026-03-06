@@ -83,6 +83,7 @@ async function sendNotification(channel, boss, minutesRemaining) {
     : boss.original_spawn;
 
   const bossImageName = boss.name
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "");
