@@ -136,7 +136,10 @@ class VoicePlayer {
   }
 
   async playWav(bossName) {
-    const soundName = bossName.toLowerCase().replace(/\s+/g, "_");
+    const soundName = bossName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
     const soundPath = path.join(__dirname, `../data/sounds/${soundName}.wav`);
     return this.playFile(soundPath);
   }

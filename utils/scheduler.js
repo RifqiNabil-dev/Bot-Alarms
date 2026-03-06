@@ -82,7 +82,10 @@ async function sendNotification(channel, boss, minutesRemaining) {
         .toFormat("HH:mm")
     : boss.original_spawn;
 
-  const bossImageName = boss.name.toLowerCase().replace(/\s+/g, "_");
+  const bossImageName = boss.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
   const imageUrl = `https://raw.githubusercontent.com/RifqiNabil-dev/Image-Boss/refs/heads/main/images/${bossImageName}.png`;
 
   const embed = new EmbedBuilder().setFooter({
