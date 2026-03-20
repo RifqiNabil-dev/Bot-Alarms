@@ -20,12 +20,14 @@ class VoicePlayer {
 
     // persistent listener to process next item in queue
     this.player.on(AudioPlayerStatus.Idle, () => {
+      this._resolveCurrentPlayback();
       this._processQueue();
     });
 
     // persistent listener for errors to prevent process crash
     this.player.on("error", (error) => {
       console.error("AudioPlayer Error:", error);
+      this._resolveCurrentPlayback();
       this._processQueue();
     });
   }
@@ -152,12 +154,24 @@ class VoicePlayer {
   }
 
   async playGTTS(text) {
-    const filePath = path.join(__dirname, "../data/temp_gtts.mp3");
+    const timestamp = Date.now();
+    const filePath = path.join(__dirname, `../data/temp_gtts_${timestamp}.mp3`);
+    
     return new Promise((resolve) => {
       gtts.save(filePath, text, async () => {
         try {
           const resource = createAudioResource(filePath);
           await this._enqueue(resource);
+          
+          // Cleanup file after it has finished playing (or was skipped)
+          if (fs.existsSync(filePath)) {
+            try {
+              fs.unlinkSync(filePath);
+            } catch (err) {
+              console.error(`Error deleting temp GTTS file ${filePath}:`, err);
+            }
+          }
+          
           resolve();
         } catch (error) {
           console.error("Error playing GTTS:", error);
