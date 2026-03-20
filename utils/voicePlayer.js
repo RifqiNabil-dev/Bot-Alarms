@@ -15,6 +15,59 @@ class VoicePlayer {
   constructor() {
     this.player = createAudioPlayer();
     this.connection = null;
+    this.queue = [];
+    this.isProcessing = false;
+
+    // persistent listener to process next item in queue
+    this.player.on(AudioPlayerStatus.Idle, () => {
+      this._processQueue();
+    });
+
+    // persistent listener for errors to prevent process crash
+    this.player.on("error", (error) => {
+      console.error("AudioPlayer Error:", error);
+      this._processQueue();
+    });
+  }
+
+  async _processQueue() {
+    if (this.queue.length === 0) {
+      this.isProcessing = false;
+      return;
+    }
+
+    this.isProcessing = true;
+    const { resource, resolve } = this.queue.shift();
+
+    // We store the resolver in case we need it, but the Idle listener handles it mostly
+    this._currentResolver = resolve;
+
+    try {
+      this.player.play(resource);
+    } catch (error) {
+      console.error("Error playing resource:", error);
+      this._resolveCurrentPlayback();
+      this._processQueue();
+    }
+  }
+
+  _resolveCurrentPlayback() {
+    if (this._currentResolver) {
+      this._currentResolver();
+      this._currentResolver = null;
+    }
+  }
+
+  async _enqueue(resource) {
+    return new Promise((resolve) => {
+      this.queue.push({ resource, resolve });
+      if (
+        !this.isProcessing &&
+        this.player.state.status === AudioPlayerStatus.Idle
+      ) {
+        this._processQueue();
+      }
+    });
   }
 
   async join(channel) {
@@ -55,7 +108,6 @@ class VoicePlayer {
       );
       if (newState.status === VoiceConnectionStatus.Disconnected) {
         console.warn("VoiceConnection disconnected. Reason:", newState.reason);
-        // Try and see why it disconnected
       }
     });
 
@@ -70,15 +122,6 @@ class VoicePlayer {
     try {
       console.log("Waiting for voice connection to be Ready...");
 
-      // Manual state transition handling for some network environments
-      this.connection.on("stateChange", (oldState, newState) => {
-        if (newState.status === VoiceConnectionStatus.Signalling) {
-          console.log(
-            "Manual trigger: detected Signalling, waiting for connection...",
-          );
-        }
-      });
-
       // Wait for Ready or Disconnected to see what happens first
       await entersState(this.connection, VoiceConnectionStatus.Ready, 45_000);
 
@@ -90,13 +133,6 @@ class VoicePlayer {
         "Voice connection failed to reach READY state within 45s:",
         error,
       );
-      // More debug info
-      console.log("Final Connection State:", this.connection.state.status);
-
-      // If we are stuck in Signalling but the bot IS in the channel,
-      // some environments can still play audio if we just proceed.
-      // But usually, it means UDP is blocked.
-
       if (this.connection) {
         this.connection.destroy();
         this.connection = null;
@@ -106,30 +142,39 @@ class VoicePlayer {
   }
 
   leave() {
+    this.queue = [];
+    this._resolveCurrentPlayback();
     if (this.connection) {
       this.connection.destroy();
       this.connection = null;
     }
+    this.player.stop();
   }
 
   async playGTTS(text) {
     const filePath = path.join(__dirname, "../data/temp_gtts.mp3");
-    return new Promise((resolve, reject) => {
-      gtts.save(filePath, text, () => {
-        const resource = createAudioResource(filePath);
-        this.player.play(resource);
-        this.player.once(AudioPlayerStatus.Idle, () => resolve());
+    return new Promise((resolve) => {
+      gtts.save(filePath, text, async () => {
+        try {
+          const resource = createAudioResource(filePath);
+          await this._enqueue(resource);
+          resolve();
+        } catch (error) {
+          console.error("Error playing GTTS:", error);
+          resolve();
+        }
       });
     });
   }
 
   async playFile(filePath) {
     if (fs.existsSync(filePath)) {
-      return new Promise((resolve) => {
+      try {
         const resource = createAudioResource(filePath);
-        this.player.play(resource);
-        this.player.once(AudioPlayerStatus.Idle, () => resolve());
-      });
+        await this._enqueue(resource);
+      } catch (error) {
+        console.error(`Error playing file ${filePath}:`, error);
+      }
     } else {
       console.warn(`File not found at ${filePath}`);
     }
