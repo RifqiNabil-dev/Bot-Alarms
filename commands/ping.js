@@ -5,11 +5,12 @@ module.exports = {
     .setName("ping")
     .setDescription("Cek latensi (ping) bot"),
   async execute(interaction) {
-    const sent = await interaction.reply({
+    await interaction.reply({
       content: "Pinging...",
-      fetchReply: true,
       flags: 64,
     });
+
+    const sent = await interaction.fetchReply();
 
     const apiLatency = sent.createdTimestamp - interaction.createdTimestamp;
     const wsLatency = interaction.client.ws.ping;
