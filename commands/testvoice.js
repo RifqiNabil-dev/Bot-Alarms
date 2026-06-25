@@ -20,9 +20,8 @@ module.exports = {
       if (!success) return interaction.editReply("Gagal bergabung ke Voice Channel.");
     }
 
-    await interaction.editReply("Sedang melakukan test voice gTTS...");
-    await voicePlayer.playGTTS(
-      "Percobaan suara bot alarm boss. Satu, dua, tiga.",
-    );
+    await interaction.editReply("Sedang melakukan test voice Edge TTS...");
+    await voicePlayer.playTTS("Boss Pan Dra'eed has spawned. Move now.");
+  
   },
 };

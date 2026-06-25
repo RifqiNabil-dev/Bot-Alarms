@@ -142,14 +142,7 @@ async function triggerVoiceAlarm(channel, boss, minutesRemaining) {
     const alertFilePath = path.join(__dirname, "../data/alert_3_minutes.mp3");
 
     const BOSS_NARRATIONS_TIME_SPECIFIC = [
-      " ALARM BOSS!. {boss} muncul di {location}!, WAKTU: {time_left} menit lagi",
-      " {boss} SPAWN!, {location} {time_left} menit LAGI anyink!",
-      " LAWAN {boss} di {location}!, WAKTU TERSISA: {time_left} menit LAGI!",
-      " TEMUKAN {boss} SEKARANG!, {time_left} menit LAGI anyink!",
-      " BOSS ALERT!. {boss} di {location}!, SISA WAKTU: {time_left} menit LAGI!",
-      " PERHATIAN! {boss} MUNCUL! loot HABIS DALAM {time_left} menit LAGI!",
-      " BOSS {boss} DI {location}!,  {time_left} menit Lagi anyink!",
-      " gaspol!, {boss} DI {location}! SISA WAKTU: {time_left}menit LAGI!",
+      " Boss {boss} incoming in {time_left} minutes. Please get ready.",
     ];
 
     const selected_narration =
@@ -163,11 +156,11 @@ async function triggerVoiceAlarm(channel, boss, minutesRemaining) {
 
     // Play alert file first, then the narration
     await voicePlayer.playFile(alertFilePath);
-    await voicePlayer.playGTTS(narration);
+    await voicePlayer.playTTS(narration);
   } else {
     await voicePlayer.playWav(boss.name);
-    const spawnNarration = `${boss.name} SEHARUSNYA sudah spawn sekarang di ${boss.area}!`;
-    await voicePlayer.playGTTS(spawnNarration);
+    const spawnNarration = `${boss.name} has spawned. Move now.`;
+    await voicePlayer.playTTS(spawnNarration);
   }
 }
 

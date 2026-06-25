@@ -56,8 +56,8 @@ module.exports = {
     await voicePlayer.playWav(boss.name);
 
     // Play spawn narration
-    const spawnNarration = `${boss.name} SEHARUSNYA sudah spawn sekarang di ${boss.area}!`;
-    await voicePlayer.playGTTS(spawnNarration);
+    const spawnNarration = `${boss.name} has spawned. Let's go!`;
+    await voicePlayer.playTTS(spawnNarration);
 
     await interaction.editReply(
       `Test spawn alert untuk **${boss.name}** selesai.`,

@@ -6,10 +6,15 @@ const {
   VoiceConnectionStatus,
   entersState,
 } = require("@discordjs/voice");
-const gTTS = require("node-gtts");
+const { EdgeTTS } = require("node-edge-tts");
 const path = require("path");
 const fs = require("fs-extra");
-const gtts = new gTTS("id"); // Language: Indonesian, Speed: Normal (slow=False)
+
+const edgeTTS = new EdgeTTS({
+  voice: process.env.EDGE_TTS_VOICE,
+  rate: process.env.EDGE_TTS_RATE,
+  pitch: process.env.EDGE_TTS_PITCH,
+});
 
 class VoicePlayer {
   constructor() {
@@ -153,32 +158,26 @@ class VoicePlayer {
     this.player.stop();
   }
 
-  async playGTTS(text) {
+  async playTTS(text) {
     const timestamp = Date.now();
-    const filePath = path.join(__dirname, `../data/temp_gtts_${timestamp}.mp3`);
+    const filePath = path.join(__dirname, `../data/temp_tts_${timestamp}.mp3`);
     
-    return new Promise((resolve) => {
-      gtts.save(filePath, text, async () => {
+    try {
+      await edgeTTS.ttsPromise(text, filePath);
+
+      const resource = createAudioResource(filePath);
+      await this._enqueue(resource);
+    } catch (error) {
+      console.error("Error playing TTS with Edge TTS:", error);
+    } finally {
+      if (fs.existsSync(filePath)) {
         try {
-          const resource = createAudioResource(filePath);
-          await this._enqueue(resource);
-          
-          // Cleanup file after it has finished playing (or was skipped)
-          if (fs.existsSync(filePath)) {
-            try {
-              fs.unlinkSync(filePath);
-            } catch (err) {
-              console.error(`Error deleting temp GTTS file ${filePath}:`, err);
-            }
-          }
-          
-          resolve();
-        } catch (error) {
-          console.error("Error playing GTTS:", error);
-          resolve();
+          fs.unlinkSync(filePath);
+        } catch (err) {
+          console.error(`Error deleting temp TTS file ${filePath}:`, err);
         }
-      });
-    });
+      }
+    }
   }
 
   async playFile(filePath) {

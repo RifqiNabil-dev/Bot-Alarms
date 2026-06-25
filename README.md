@@ -5,7 +5,7 @@ Sebuah Discord bot yang dirancang untuk memantau waktu spawn Boss (World Boss/Ra
 ## ✨ Fitur Utama
 
 - **Boss Scheduler**: Secara otomatis membaca jadwal boss dari Google Sheets.
-- **Voice Notifications**: Memberikan peringatan suara menggunakan GTTS (Google Text-to-Speech) sebelum boss muncul.
+- **Voice Notifications**: Memberikan peringatan suara menggunakan ElevenLabs Text-to-Speech sebelum boss muncul.
 - **Custom Boss Sounds**: Memutar suara unik untuk setiap boss tertentu.
 - **Interactive Embeds**: Menampilkan jadwal boss yang rapi di channel Discord.
 - **Slash Commands**: Navigasi bot yang mudah menggunakan sistem perintah modern Discord.
