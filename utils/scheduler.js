@@ -167,7 +167,6 @@ async function sendNotification(channel, boss, minutesRemaining) {
   embed.setImage(imageUrl);
 
   await channel.send({
-    content: mention || undefined,
     embeds: [embed],
   });
 }
