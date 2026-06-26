@@ -3,5 +3,6 @@ node_modules/
 credentials.json
 data/temp_gtts.mp3
 data_boss.json
+invasi_boss.json
 *.log
 .DS_Store

@@ -21,7 +21,9 @@ module.exports = {
     }
 
     await interaction.editReply("Sedang melakukan test voice Edge TTS...");
-    await voicePlayer.playTTS("Boss Pan Dra'eed has spawned. Move now.");
+    await voicePlayer.playTTS(
+      "Boss Pan Dra'eed incoming in 3 minutes. Please get ready.",
+    );
   
   },
 };
