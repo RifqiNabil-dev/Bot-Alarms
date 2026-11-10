@@ -1,4 +1,4 @@
-# AlarmBot ⏰
+# Alarm Bot Discord ⏰
 
 Sebuah Discord bot yang dirancang untuk memantau waktu spawn Boss (World Boss/Raid Boss) dan memberikan notifikasi suara (Voice Alert) secara otomatis ke dalam Voice Channel.
 
