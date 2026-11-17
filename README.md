@@ -1,6 +1,6 @@
-# Alarm Bot Discord Untuk Lineage2M ⏰
+# Alarm Bot Discord Untuk Games Lineage2M ⏰
 
-Sebuah Discord bot yang dirancang untuk memantau waktu spawn Boss (World Boss/Raid Boss) dan memberikan notifikasi suara (Voice Alert) secara otomatis ke dalam Voice Channel.
+Discord bot yang digunakan untuk memantau waktu spawn Boss (World Boss/Raid Boss) dan memberikan notifikasi suara (Voice Alert) secara otomatis ke dalam Voice Channel.
 
 ## ✨ Fitur Utama
 
